@@ -13,24 +13,39 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const secret = NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret';
 
 // получение всех пользователей
-module.exports.getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => {
-      if (!users) {
-        return next(new NotFoundError('Пользователи не найдены'));
-      }
-      return res.send({
-        data: users,
-      });
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
+// module.exports.getUsers = (req, res, next) => {
+//   User.find({})
+//     .then((users) => {
+//       if (!users) {
+//         return next(new NotFoundError('Пользователи не найдены'));
+//       }
+//       return res.send({
+//         data: users,
+//       });
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
 
 // получение пользователя по id
-module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
+// module.exports.getUserById = (req, res, next) => {
+//   User.findById(req.params.userId)
+//     .then((user) => {
+//       if (!user) {
+//         return next(new NotFoundError('Запрашиваемый пользователь не найден'));
+//       }
+//       return res.send(user);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// };
+
+// GET /users/me - возвращает информацию о пользователе (email и имя)
+module.exports.getUsersMe = (req, res, next) => {
+  const { _id } = req.user;
+  User.findById(_id)
     .then((user) => {
       if (!user) {
         return next(new NotFoundError('Запрашиваемый пользователь не найден'));
@@ -38,16 +53,19 @@ module.exports.getUserById = (req, res, next) => {
       return res.send(user);
     })
     .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new IncorrectDataError('В запросе переданы некорректные данные'));
+      }
       next(err);
     });
 };
 
-// создание пользователя
+// POST /signup
+// создаёт пользователя с переданными в теле email, password и name
+
 module.exports.createUser = (req, res, next) => {
   const {
     name,
-    about,
-    avatar,
     email,
     password,
   } = req.body;
@@ -55,15 +73,11 @@ module.exports.createUser = (req, res, next) => {
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
-      about,
-      avatar,
       email,
       password: hash,
     }))
     .then((user) => res.send({
       name: user.name,
-      about: user.about,
-      avatar: user.avatar,
       email: user.email,
       _id: user._id,
     }))
@@ -77,17 +91,17 @@ module.exports.createUser = (req, res, next) => {
     });
 };
 
-// обновление профиля пользователя
+//  PATCH /users/me - обновление профиля пользователя
 module.exports.updateUserProfile = (req, res, next) => {
   const {
     name,
-    about,
+    email,
   } = req.body;
   User.findByIdAndUpdate({
     _id: req.user._id,
   }, {
     name,
-    about,
+    email,
   }, {
     new: true, // обработчик then получит на вход обновлённую запись
     runValidators: true, // данные будут валидированы перед изменением
@@ -108,31 +122,35 @@ module.exports.updateUserProfile = (req, res, next) => {
     });
 };
 
-module.exports.updateAvatar = (req, res, next) => {
-  const {
-    avatar,
-  } = req.body;
-  User.findByIdAndUpdate(req.user._id, {
-    avatar,
-  }, {
-    new: true, // обработчик then получит на вход обновлённую запись
-    runValidators: true, // данные будут валидированы перед изменением
-  })
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Запрашиваемый пользователь не найден'));
-      }
-      return res.send({
-        data: user,
-      });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return next(new IncorrectDataError('Ошибка: Введены некорректные данные'));
-      }
-      return next(err);
-    });
-};
+// module.exports.updateAvatar = (req, res, next) => {
+//   const {
+//     avatar,
+//   } = req.body;
+//   User.findByIdAndUpdate(req.user._id, {
+//     avatar,
+//   }, {
+//     new: true, // обработчик then получит на вход обновлённую запись
+//     runValidators: true, // данные будут валидированы перед изменением
+//   })
+//     .then((user) => {
+//       if (!user) {
+//         return next(new NotFoundError('Запрашиваемый пользователь не найден'));
+//       }
+//       return res.send({
+//         data: user,
+//       });
+//     })
+//     .catch((err) => {
+//       if (err.name === 'ValidationError') {
+//         return next(new IncorrectDataError('Ошибка: Введены некорректные данные'));
+//       }
+//       return next(err);
+//     });
+// };
+
+// POST /signin аутентификация
+// проверяет переданные в теле почту и пароль
+// и возвращает JWT
 
 module.exports.login = (req, res, next) => {
   const {
@@ -166,21 +184,4 @@ module.exports.login = (req, res, next) => {
         .catch((err) => next(err));
     })
     .catch(next);
-};
-
-module.exports.getUsersMe = (req, res, next) => {
-  const { _id } = req.user;
-  User.findById(_id)
-    .then((user) => {
-      if (!user) {
-        return next(new NotFoundError('Запрашиваемый пользователь не найден'));
-      }
-      return res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new IncorrectDataError('В запросе переданы некорректные данные'));
-      }
-      next(err);
-    });
 };
