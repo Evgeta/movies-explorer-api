@@ -26,7 +26,7 @@ router.post('/signup', celebrate({
 
 router.use(auth);
 router.use('/users', require('./users'));
-// router.use('/cards', require('./cards'));
+router.use('/movies', require('./movies'));
 
 router.use(() => { throw new NotFoundError('Страница не найдена'); });
 
