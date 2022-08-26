@@ -1,7 +1,7 @@
 const {
   NODE_ENV = 'development',
   JWT_SECRET = 'dev-secret',
-  PORT = 3000,
+  PORT = 3002,
   DB_PATH = 'mongodb://localhost:27017/moviesdb',
 } = process.env;
 
@@ -11,6 +11,8 @@ const allowedCors = [
   'http://mesto.evgeta.nomoredomains.sbs',
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:3003',
 ];
 
 // Тексты сообщений

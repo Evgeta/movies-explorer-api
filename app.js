@@ -12,8 +12,8 @@ const limiter = require('./middlewares/rate-limitter');
 const app = express();
 const router = require('./routes/index');
 
-// Слушаем 3000 порт
-const { PORT = 3000 } = process.env;
+// Слушаем 3002 порт
+const { PORT = 3002 } = process.env;
 
 // mongoose.connect('mongodb://localhost:27017/moviesdb', {
 //   useNewUrlParser: true,
