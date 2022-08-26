@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const errorHandler = require('./middlewares/errorHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { DB_PATH, allowedCors } = require('./utils/config');
+const limiter = require('./middlewares/rate-limitter');
 
 const app = express();
 const router = require('./routes/index');
@@ -13,17 +15,21 @@ const router = require('./routes/index');
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
 
-mongoose.connect('mongodb://localhost:27017/moviesdb', {
+// mongoose.connect('mongodb://localhost:27017/moviesdb', {
+//   useNewUrlParser: true,
+// });
+
+mongoose.connect(DB_PATH, {
   useNewUrlParser: true,
 });
 
-// Массив разешённых доменов
-const allowedCors = [
-  'https://mesto.evgeta.nomoredomains.sbs',
-  'http://mesto.evgeta.nomoredomains.sbs',
-  'http://localhost:3000',
-  'http://localhost:3001',
-];
+// // Массив разешённых доменов
+// const allowedCors = [
+//   'https://mesto.evgeta.nomoredomains.sbs',
+//   'http://mesto.evgeta.nomoredomains.sbs',
+//   'http://localhost:3000',
+//   'http://localhost:3001',
+// ];
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -49,6 +55,8 @@ app.use((req, res, next) => {
 });
 
 app.use(requestLogger); // подключаем логгер запросов
+
+app.use(limiter);
 
 app.get('/crash-test', () => {
   setTimeout(() => {
