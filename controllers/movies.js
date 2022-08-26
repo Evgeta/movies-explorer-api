@@ -4,13 +4,24 @@ const NotFoundError = require('../errors/NotFoundError');
 
 const Movie = require('../models/movie');
 
-// Получение всех фильмов
+const {
+  FILMS_NOT_FOUND_MESSAGE,
+  INCORRECT_DATA_ERROR_MESSAGE,
+  FILM_NOT_FOUND_MESSAGE,
+  NOT_ALLOWED_TO_REMOVE_MESSAGE,
+} = require('../errors/errors');
+
+// const {
+//   FILM_DELETE_SUCCESSFUL_MESSAGE,
+// } = require('../utils/config');
+
+// Получение всех фильмов владельца
 module.exports.getMovies = (req, res, next) => {
   const owner = req.user._id;
   Movie.find({ owner })
     .then((movies) => {
-      if (!movies) {
-        return next(new NotFoundError('Не удалось найти фильмы'));
+      if (movies.length === 0) {
+        return next(new NotFoundError(FILMS_NOT_FOUND_MESSAGE));
       }
       return res.send({
         movies,
@@ -57,7 +68,7 @@ module.exports.createMovie = (req, res, next) => {
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new IncorrectDataError('В запросе переданы некорректные данные'));
+        next(new IncorrectDataError(INCORRECT_DATA_ERROR_MESSAGE));
       }
       return next(err);
     });
@@ -67,11 +78,11 @@ module.exports.createMovie = (req, res, next) => {
 module.exports.deleteMovieById = (req, res, next) => {
   Movie.findById(req.params.movieId)
     .then((movie) => {
-      if (!movie) {
-        return next(new NotFoundError('Карточка с таким id не найдена'));
+      if (movie === null) {
+        return next(new NotFoundError(FILM_NOT_FOUND_MESSAGE));
       }
       if (!movie.owner.equals(req.user._id)) {
-        return next(new ForbiddenDeleteError('Нельзя удалить фильм, отмеченный другим пользователем'));
+        return next(new ForbiddenDeleteError(NOT_ALLOWED_TO_REMOVE_MESSAGE));
       }
       return movie.remove().then(() => res.send({
         message: 'Фильм удалён',
@@ -79,7 +90,7 @@ module.exports.deleteMovieById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return next(new IncorrectDataError('В запросе переданы некорректные данные'));
+        return next(new IncorrectDataError(INCORRECT_DATA_ERROR_MESSAGE));
       }
       return next(err);
     });

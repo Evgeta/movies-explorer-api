@@ -13,6 +13,10 @@ const allowedCors = [
   'http://localhost:3001',
 ];
 
+// Тексты сообщений
+module.exports.AUTHORIZATION_SUCCESSFUL_MESSAGE = 'Указан некорректный URL';
+module.exports.FILM_DELETE_SUCCESSFUL_MESSAGE = 'Фильм удалён';
+
 module.exports = {
   allowedCors,
   JWT_SECRET,
