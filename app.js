@@ -15,21 +15,9 @@ const router = require('./routes/index');
 // Слушаем 3002 порт
 const { PORT = 3002 } = process.env;
 
-// mongoose.connect('mongodb://localhost:27017/moviesdb', {
-//   useNewUrlParser: true,
-// });
-
 mongoose.connect(DB_PATH, {
   useNewUrlParser: true,
 });
-
-// // Массив разешённых доменов
-// const allowedCors = [
-//   'https://mesto.evgeta.nomoredomains.sbs',
-//   'http://mesto.evgeta.nomoredomains.sbs',
-//   'http://localhost:3000',
-//   'http://localhost:3001',
-// ];
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

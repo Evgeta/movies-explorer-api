@@ -11,9 +11,6 @@ const {
   NOT_ALLOWED_TO_REMOVE_MESSAGE,
 } = require('../errors/errors');
 
-// const {
-//   FILM_DELETE_SUCCESSFUL_MESSAGE,
-// } = require('../utils/config');
 
 // Получение всех фильмов владельца
 module.exports.getMovies = (req, res, next) => {
