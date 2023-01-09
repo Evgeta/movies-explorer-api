@@ -1,11 +1,11 @@
-const { NOT_FOUND_ERROR_CODE } = require('./errors');
+const { NOT_FOUND_ERROR_CODE, USER_NOT_FOUND_MESSAGE } = require('./errors');
 
 class NotFoundError extends Error {
   constructor(message) {
     super(message);
     this.name = 'NotFoundError';
     this.statusCode = NOT_FOUND_ERROR_CODE;
-    this.message = 'Запрашиваемый объект не найден';
+    this.message = USER_NOT_FOUND_MESSAGE;
   }
 }
 
