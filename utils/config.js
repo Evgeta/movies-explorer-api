@@ -7,7 +7,7 @@ const {
 
 // Массив разешённых доменов
 const allowedCors = [
-  'https://mestomoviesexplorer.evgeta.nomoredomains.sbs',
+  'https://moviesexplorer.evgeta.nomoredomains.sbs',
   'http://moviesexplorer.evgeta.nomoredomains.sbs',
   'http://localhost:3000',
   'http://localhost:3001',
