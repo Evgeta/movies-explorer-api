@@ -34,9 +34,6 @@ module.exports.getUsersMe = (req, res, next) => {
       return res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new IncorrectDataError(INCORRECT_DATA_ERROR_MESSAGE));
-      }
       next(err);
     });
 };
@@ -65,10 +62,10 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.code === 11000) {
         next(new UserExistsError(DUPLICATE_USER_MESSAGE));
-      } else if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new IncorrectDataError(INCORRECT_DATA_ERROR_MESSAGE));
-      }
-      next(err);
+      } else next(err);
+      // if (err.name === 'ValidationError' || err.name === 'CastError') {
+      //   next(new IncorrectDataError(INCORRECT_DATA_ERROR_MESSAGE));
+      // }
     });
 };
 

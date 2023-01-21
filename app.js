@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
+const { SERVER_WILL_BE_DOWN } = require('./errors/errors');
 const errorHandler = require('./middlewares/errorHandler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { DB_PATH, allowedCors } = require('./utils/config');
@@ -18,6 +19,10 @@ const { PORT = 3002 } = process.env;
 mongoose.connect(DB_PATH, {
   useNewUrlParser: true,
 });
+
+app.use(requestLogger); // подключаем логгер запросов
+
+app.use(limiter);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -42,13 +47,9 @@ app.use((req, res, next) => {
   return null;
 });
 
-app.use(requestLogger); // подключаем логгер запросов
-
-app.use(limiter);
-
 app.get('/crash-test', () => {
   setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
+    throw new Error(SERVER_WILL_BE_DOWN);
   }, 0);
 });
 

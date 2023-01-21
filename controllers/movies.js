@@ -11,7 +11,6 @@ const {
   NOT_ALLOWED_TO_REMOVE_MESSAGE,
 } = require('../errors/errors');
 
-
 // Получение всех фильмов владельца
 module.exports.getMovies = (req, res, next) => {
   const owner = req.user._id;
